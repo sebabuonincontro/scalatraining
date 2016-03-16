@@ -40,3 +40,4 @@ val t2 = new NonEmpty(50, Empty, Empty)
 t1 union t2
 val t3 = new NonEmpty(5, Empty, Empty)
 t3 union t1
+t1 incl 11 incl 8

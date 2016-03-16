@@ -21,7 +21,6 @@ factorial(3)
 factorial(3)(x => x * x)
 
 
-
 //-----------------------------------------
 def add(x:Int)(y:Int) = x + y
 
@@ -33,4 +32,3 @@ add(1)(3)
 def addOne(x:Int) = add(1)(x)
 
 addOne(4)
-
