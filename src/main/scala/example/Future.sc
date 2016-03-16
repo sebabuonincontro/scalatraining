@@ -1,21 +1,52 @@
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
-import scala.util.Success
+import scala.concurrent.duration.Duration
 
 val foa: Future[Option[Int]] = Future{Some(1)}
 val fob: Future[Option[Int]] = Future{Some(2)}
 
-def sumFuture(x: Future[Option[Int]], y: Future[Option[Int]]) : Int  = {
-  def decompose(from: Future[Option[Int]]) : Int = {
-    def a = from.onComplete{
-      case Success(value) => Some(value)
-    }
-    a
-  }
+val foc: Future[Option[Int]] = Future{Some(3)}
+val fod: Future[Option[Int]] = Future{Some(4)}
 
-  decompose(x) + decompose(y)
+val otherFuture = foc.flatMap{
+  case None => Future{None}
+  case Some(value) => {
+    fod.flatMap{
+      case Some(value2) => Future{value + value2}
+      case None => Future{None}
+    }
+  }
 }
 
+Await.result(otherFuture, Duration.Inf)
+
+val futureSeba =(for {
+  f1 <- foa if f1.isDefined
+  f2 <- fob if f2.isDefined
+} yield {
+  f1.get + f2.get
+}).recover{
+  case _ => None
+}
+
+Await.result(futureSeba, Duration.Inf)
+
+//---------------------------------------------------
+//Future 2
+
+def decompose[T](fo1:Future[Option[T]],fo2:Future[Option[T]])(f:(T,T)=> T) = {
+  fo1.flatMap{
+    case None => Future{None}
+    case Some(value) => {
+      fo2.flatMap{
+        case Some(value2) => Future{f(value, value2)}
+        case None => Future{None}
+      }
+    }
+  }
+}
+
+Await.result(decompose(Future{Option{"a"}}, Future{Option{"b"}})((x1:String,x2:String) => x1 + "->" + x2), Duration.Inf)
 
 
 
