@@ -16,7 +16,6 @@ val otherFuture = foc.flatMap{
       case None => Future{None}
     }
   }
-}
 
 Await.result(otherFuture, Duration.Inf)
 
